@@ -56,6 +56,7 @@ public class CalcPost {
         this.repository = repository;
     }
 
+    @Path("calculations")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllCalculations() {
