@@ -1,17 +1,15 @@
 package calculations;
 
 import java.util.List;
-import javax.ejb.Stateful;
 import javax.ejb.Stateless;
-import javax.enterprise.inject.Produces;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.inject.Inject;
+
 
 
 @Stateless
@@ -50,11 +48,25 @@ public class CalcPost {
             return Response.serverError().build();
         }
     }
+    
+    private CalculationRepository repository;
+
+    @Inject
+    public void CalculationResource(CalculationRepository repository) {
+        this.repository = repository;
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Calculation> listAllItems() {
-        // replace repository with actual repository object
-        return repository.findAllItemsForUser(currentUser);
+    public Response getAllCalculations() {
+        try {
+            List<Calculation> calculations = repository.getAllCalculations();
+            if (calculations.isEmpty()) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            return Response.ok(calculations).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
